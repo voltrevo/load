@@ -7,16 +7,15 @@ var builtins = {
   'console': console
 };
 
-var cache = {
-  'console': console
-};
+var cache = {};
+var cwd = process.cwd();
 
 var load = function(filePath, customLoad) {
   if (builtins[filePath]) {
     return builtins[filePath];
   }
 
-  var resolvedPath = path.resolve(__dirname, filePath);
+  var resolvedPath = path.resolve(cwd, filePath);
 
   if (cache[resolvedPath]) {
     return cache[resolvedPath];
