@@ -1,0 +1,16 @@
+{
+    "node": true,
+    "eqeqeq": true,
+    "strict": true,
+    "validthis": true,
+    "newcap": false,
+    "expr": true,
+    "indent": 4,
+    "latedef": true,
+    "nonbsp": true,
+    "unused": true,
+    "loopfunc": true,
+    "maxstatements": 30,
+    "maxcomplexity": 8,
+    "supernew": true
+}
