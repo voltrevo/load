@@ -1,0 +1,25 @@
+{
+  "name": "load",
+  "version": "0.0.1",
+  "description": "Alternative module loader to commonjs.",
+  "main": "index.js",
+  "scripts": {
+    "test": "node cli.js test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/voltrevo/load.git"
+  },
+  "keywords": [
+    "javascript",
+    "module",
+    "loader"
+  ],
+  "author": "Andrew Morris",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/voltrevo/load/issues"
+  },
+  "homepage": "https://github.com/voltrevo/load#readme",
+  "private": true
+}
