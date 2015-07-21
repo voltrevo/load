@@ -1,1 +1,1 @@
-// TODO
+load('./relativePaths/index.js');

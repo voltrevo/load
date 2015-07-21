@@ -4,19 +4,19 @@ var fs = require('fs');
 var path = require('path');
 
 var builtins = {
-  'console': console
+  console: console,
+  assert: require('assert')
 };
 
-module.exports = function() {
-  var cache = {};
-  var cwd = process.cwd();
+var createLoader = function(startPath, cache) {
+  cache = cache || {};
 
-  var load = function(filePath, customLoad) {
+  var load = function(filePath) {
     if (builtins[filePath]) {
       return builtins[filePath];
     }
 
-    var resolvedPath = path.resolve(cwd, filePath);
+    var resolvedPath = path.resolve(startPath, filePath);
 
     if (cache[resolvedPath]) {
       return cache[resolvedPath];
@@ -37,18 +37,23 @@ module.exports = function() {
     theEvilEval = eval;
     /* jshint ignore:end */
 
-    var moduleOutput = theEvilEval(
+    var moduleFunction = theEvilEval(
       '(function(load, ' + globals.join(', ') + ') {\n' +
       '  \'use strict\';\n' +
       '\n' +
       contents +
       '})'
-    )(customLoad || load);
+    );
 
-    cache[resolvedPath] = moduleOutput;
+    var innerLoader = createLoader(path.dirname(resolvedPath), cache);
+    var moduleResult = moduleFunction(innerLoader);
 
-    return moduleOutput;
+    cache[resolvedPath] = moduleResult;
+
+    return moduleResult;
   };
 
   return load;
 };
+
+module.exports = createLoader;
