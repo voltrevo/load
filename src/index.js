@@ -3,20 +3,41 @@
 var fs = require('fs');
 var path = require('path');
 
-var builtins = {
-  console: console,
-  assert: require('assert')
+var wrapFn = function(value) {
+  return function() {
+    return value;
+  };
 };
 
-var createLoader = function(startPath, cache) {
+var wrapRequire = function(moduleName) {
+  var cache;
+
+  return function() {
+    if (cache === undefined) {
+      cache = require(moduleName);
+    }
+
+    return cache;
+  };
+};
+
+var builtins = {
+  console: wrapFn(console),
+  assert: wrapRequire('assert'),
+  fs: wrapRequire('fs'),
+  path: wrapRequire('path'),
+  dirname: function(dirname) { return dirname; }
+};
+
+var createLoader = function(dirname, cache) {
   cache = cache || {};
 
   var load = function(filePath) {
     if (builtins[filePath]) {
-      return builtins[filePath];
+      return builtins[filePath](dirname);
     }
 
-    var resolvedPath = path.resolve(startPath, filePath);
+    var resolvedPath = path.resolve(dirname, filePath);
 
     if (cache[resolvedPath]) {
       return cache[resolvedPath];
