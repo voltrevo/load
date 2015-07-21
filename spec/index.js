@@ -8,5 +8,3 @@ fs.readdirSync(dirname).filter(function(dirCandidate) {
   var index = path.join(testDir, 'index.js');
   load(index);
 });
-
-//load('./relativePaths/index.js');
