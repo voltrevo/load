@@ -3,16 +3,20 @@
 var coreModules = {};
 var idGen = require('./idGen.js');
 
-var globals = {
-  console: console,
-  Promise: Promise
-};
+var globals = [
+  'console',
+  'Promise' // Doesn't exist in node 0.10
+];
 
-Object.keys(globals).forEach(function(globalName) {
+globals.forEach(function(globalName) {
+  if (!(globalName in global)) {
+    return;
+  }
+
   coreModules[globalName] = function() {
     return {
       success: true,
-      value: function(/* load */) { return globals[globalName]; },
+      value: function(/* load */) { return global[globalName]; },
       location: globalName,
       id: idGen()
     };
