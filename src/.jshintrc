@@ -12,5 +12,6 @@
     "loopfunc": true,
     "maxstatements": 30,
     "maxcomplexity": 8,
+    "predef": ["Promise"],
     "supernew": true
 }

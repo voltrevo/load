@@ -5,10 +5,10 @@ if (process.argv.length !== 3) {
   process.exit(1);
 }
 
-var createLoader = require('./index.js');
+var createLoad = require('./index.js');
 var path = require('path');
 
-var load = createLoader('/');
+var load = createLoad('/');
 
 var entryPointAbsolutePath = path.resolve(process.cwd(), process.argv[2]);
 

@@ -1,6 +1,8 @@
 'use strict';
 
 var fs = require('fs');
+var idGen = require('./idGen.js');
+var path = require('path');
 
 var globals = Object.keys(global).filter(function(globalVariable) {
   return /^[$A-Z_][0-9A-Z_$]*$/i.test(globalVariable);
@@ -29,8 +31,29 @@ var loadAbsPath = function(absPath) {
   );
 };
 
-module.exports = function(absPath) {
-  return function() {
-    return loadAbsPath(absPath);
+module.exports = function() {
+  var cache = {};
+
+  return function(filename, loadName) {
+    var absPath = loadName;
+
+    if (!path.isAbsolute(absPath)) {
+      return { success: false };
+    }
+
+    var loaded = cache[absPath];
+
+    if (!loaded) {
+      loaded = {
+        success: true,
+        value: loadAbsPath(absPath),
+        location: absPath,
+        id: idGen()
+      };
+
+      cache[absPath] = loaded;
+    }
+
+    return loaded;
   };
 };

@@ -1,60 +1,43 @@
 'use strict';
 
-var path = require('path');
+var createCoreLoader = require('./createCoreLoader.js');
+var createFileLoader = require('./createFileLoader.js');
+var createLoader = require('./createLoader.js');
+var resolve = require('./resolve.js');
 
-var fileLoader = require('./fileLoader.js');
+var createLoad = function(filename, loader, cache) {
+  loader = loader || createLoader({
+    coreLoader: createCoreLoader(),
+    fileLoader: createFileLoader(),
+    resolve: resolve
+  });
 
-var wrapFn = function(value) {
-  return function() {
-    return value;
-  };
-};
+  cache = cache || [];
 
-var wrapRequire = function(moduleName) {
-  var cache;
+  var load = function(loadName) {
+    var result = loader(filename, loadName);
 
-  return function() {
-    if (cache === undefined) {
-      cache = require(moduleName);
+    if (!result.success) {
+      throw new Error('In ' + filename + ', failed to load ' + loadName);
     }
 
-    return cache;
-  };
-};
+    var cached = cache[result.id];
 
-var builtins = {
-  console: wrapFn(console),
-  assert: wrapRequire('assert'),
-  fs: wrapRequire('fs'),
-  path: wrapRequire('path'),
-  dirname: function(dirname) { return dirname; }
-};
-
-var createLoader = function(dirname, cache) {
-  cache = cache || {};
-
-  var load = function(filePath) {
-    if (builtins[filePath]) {
-      return builtins[filePath](dirname);
+    if (cached) {
+      return cached.loadedModule;
     }
 
-    var resolvedPath = path.resolve(dirname, filePath);
+    var moduleFn = result.value;
 
-    if (cache[resolvedPath]) {
-      return cache[resolvedPath];
-    }
+    var nextLoader = createLoad(result.location, loader, cache);
+    var loadedModule = moduleFn(nextLoader);
 
-    var moduleFunction = fileLoader(resolvedPath)(dirname);
+    cache[result.id] = { loadedModule: loadedModule };
 
-    var innerLoader = createLoader(path.dirname(resolvedPath), cache);
-    var moduleResult = moduleFunction(innerLoader);
-
-    cache[resolvedPath] = moduleResult;
-
-    return moduleResult;
+    return loadedModule;
   };
 
   return load;
 };
 
-module.exports = createLoader;
+module.exports = createLoad;
