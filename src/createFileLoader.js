@@ -4,11 +4,24 @@ var fs = require('fs');
 var idGen = require('./idGen.js');
 var path = require('path');
 
-var globals = Object.keys(global).filter(function(globalVariable) {
-  return /^[$A-Z_][0-9A-Z_$]*$/i.test(globalVariable);
-});
+var thingsThatMaybeShouldBeKeywords = [
+  'Infinity',
+  'NaN',
+  'Object',
+  'Array',
+  'Boolean',
+  'Number',
+  'Function',
+  'String',
+  'undefined'
+];
 
-globals.push('Promise');
+var globals = Object.getOwnPropertyNames(global).filter(function(globalVariable) {
+  return (
+    thingsThatMaybeShouldBeKeywords.indexOf(globalVariable) === -1 &&
+    /^[$A-Z_][0-9A-Z_$]*$/i.test(globalVariable)
+  );
+});
 
 var loadAbsPath = function(absPath) {
   var contents = fs.readFileSync(absPath).toString()
@@ -24,10 +37,12 @@ var loadAbsPath = function(absPath) {
 
   return theEvilEval(
     '(function(load, ' + globals.join(', ') + ') {\n' +
+    'return (function(load) { \n' +
     '  \'use strict\';\n' +
     '\n' +
     contents +
-    '})'
+    '})(load);\n' +
+    '});'
   );
 };
 
