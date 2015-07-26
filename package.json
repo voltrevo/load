@@ -4,7 +4,7 @@
   "description": "Alternative module loader to commonjs.",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/.bin/jshint src spec examples && node src/cli.js spec/index.js"
+    "test": "./node_modules/.bin/jshint src tests examples && node src/cli.js tests/index.js"
   },
   "repository": {
     "type": "git",
